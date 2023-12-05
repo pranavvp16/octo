@@ -14,12 +14,20 @@ parser.add_argument(
     action='version',
     version=f'%(prog)s {VERSION}'
 )
+parser.add_argument(
+    'auth',
+    help = "Authenticate the user with Mindsdb",
+    action='store_true'
+)
 
-init_parser = parser.add_argument(
+parser.add_argument(
     'init',
     help='Initialize the project'
 )
-init_parser.
+
 args = parser.parse_args()
-print(args.init)
+if args.auth:
+    email = input("Enter your email: ")
+    password = input("Enter your password: ")
+    print("Authenticating user")
 
