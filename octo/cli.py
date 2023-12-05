@@ -1,6 +1,25 @@
-from argparse import ArgumentParser
+import argparse
+from constants.info import DESCRIPTION, VERSION, ASCII_ART
+import os
 
-parser = ArgumentParser()
-parser.add_argument('name', help='The name of the repository')
-parser.add_argument('--private', help='Make the repository private', action='store_true')
-parser.add_argument('--description', help='The repository description')
+parser = argparse.ArgumentParser(
+    description=DESCRIPTION,
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+    epilog=ASCII_ART,
+    prog='octo'
+)
+
+parser.add_argument(
+    '-v', '--version',
+    action='version',
+    version=f'%(prog)s {VERSION}'
+)
+
+init_parser = parser.add_argument(
+    'init',
+    help='Initialize the project'
+)
+init_parser.
+args = parser.parse_args()
+print(args.init)
+
