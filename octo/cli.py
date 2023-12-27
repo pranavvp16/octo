@@ -1,6 +1,6 @@
 import argparse
 from constants.info import DESCRIPTION, VERSION, ASCII_ART
-import os
+from getpass import getpass
 import keyring
 
 
@@ -12,11 +12,12 @@ def save_password(email, password):
 parser = argparse.ArgumentParser(
     description=DESCRIPTION,
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog=ASCII_ART,
     prog="octo",
 )
 
-parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {VERSION}")
+parser.add_argument(
+    "-v", "--version", action="version", version=ASCII_ART.format(VERSION)
+)
 parser.add_argument(
     "auth", help="Authenticate the user with Mindsdb", action="store_true"
 )
@@ -27,7 +28,7 @@ args = parser.parse_args()
 
 if args.auth:
     email = input("Enter your email: ")
-    password = input("Enter your password: ")
+    password = getpass(f"Enter password for {email}: ")
 
     # Save the password using keyring
     save_password(email, password)
