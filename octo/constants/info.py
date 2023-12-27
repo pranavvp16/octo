@@ -3,7 +3,6 @@
 DESCRIPTION = "The command line tool for GitHub"
 VERSION = "0.0.1"
 
-# TODO: Create ASCII art for the application
 ASCII_ART = """ 
   _____                  
  / ___ \       _         
