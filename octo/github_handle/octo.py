@@ -1,9 +1,9 @@
 import os
 import json
-from octo.github_handle.mindsdb_github import Mindsdb_Github
+from octo.github_handle.mindsdb_octo import MindsdbOcto
 
 
-class Octo(Mindsdb_Github):
+class Octo(MindsdbOcto):
     def __init__(self):
         super().__init__()
         self.repo_initialized = False
@@ -14,40 +14,50 @@ class Octo(Mindsdb_Github):
     def init(self, repo, owner, branch, all_files=False):
         if not os.path.exists(".octo"):
             os.makedirs(".octo")
-            print("Initialized empty repository.")
             self.repo = repo
             self.owner = owner
             if branch:
                 self.branch = branch
             self.repo_initialized = True
-            self.create_model(self.owner, self.repo, self.branch, all_files=all_files)
+            message = self.create_model(
+                self.owner, self.repo, self.branch, all_files=all_files
+            )
             self._save_state()
-        elif self.repo == repo and self.owner == owner and self.branch == branch:
-            print("Repository already initialized.")
+        elif (
+            self.repo.lower() == repo
+            and self.owner.lower() == owner
+            and self.branch.lower() == branch
+        ):
+            message = f"[bold][blue]Repository already initialized."
             self.repo_initialized = True
         else:
             self.repo = repo
             self.owner = owner
             self.branch = branch
             self.repo_initialized = True
-            self.create_model(self.owner, self.repo, self.branch, all_files=all_files)
+            message = self.create_model(
+                self.owner, self.repo, self.branch, all_files=all_files
+            )
             self._save_state()
+        return message
 
-    def checkout(self, repo, owner):
+    def checkout(self, owner, repo):
         self.owner = owner
         self.repo = repo
         model_names = [i.name for i in self._get_project().list_models()]
         if f"{owner}_{repo}" not in model_names:
-            print("Error: Repository not initialized. Use 'octo init' to initialize.")
+            return f"[bold][red]Error: Repository not initialized. Use 'octo init' to initialize."
         else:
-            print(f"Switched to repo '{owner}/{repo}'.")
             self.status()
             self._save_state()
+            return f"[bold][green]Switched to repo '{owner}/{repo}'."
 
     def status(self):
-        print(f"On branch {self.branch}")
-        print(f"Owner: {self.owner}")
-        print(f"Repo: {self.repo}")
+        return f"[bold][green]On branch {self.branch}\n[bold][blue]Repository: {self.owner}/{self.repo}"
+
+    def list_models(self):
+        model_names = [i.name for i in self._get_project().list_models()]
+        return model_names
 
     def tell(self, df):
         pred = self.predict(df, self.owner, self.repo)

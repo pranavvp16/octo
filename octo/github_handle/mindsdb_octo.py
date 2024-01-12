@@ -6,7 +6,7 @@ import time
 from octo.templates.query_dicts import using_dict, using_dict_all
 
 
-class Mindsdb_Github:
+class MindsdbOcto:
     """Mindsdb class to interact with Mindsdb SDK"""
 
     def __init__(self):
@@ -19,7 +19,6 @@ class Mindsdb_Github:
         """
         Connect to local installation of mindsdb
         """
-        print("Starting mindsdb local server")
         # Run shell command to start the local mindsdb server
         subprocess.Popen(
             ["python", "-m", "mindsdb"],
@@ -36,7 +35,7 @@ class Mindsdb_Github:
             using_dict["branch"] = branch
             using_dict["openai_api_key"], using_dict["github_token"] = self._get_keys()
             model = project.create_model(
-                name=f"{owner}/{repo}",
+                name=f"{owner}_{repo}".lower(),
                 engine="llama_index",
                 predict="answer",
                 options=using_dict,
@@ -50,27 +49,24 @@ class Mindsdb_Github:
                 using_dict_all["github_token"],
             ) = self._get_keys()
             model = project.create_model(
-                name=f"{owner}_{repo}",
+                name=f"{owner}_{repo}".lower(),
                 engine="llama_index",
                 predict="answer",
                 options=using_dict_all,
             )
-        print("Waiting for model training to complete...please be patient")
-        for i in range(400):
-            print(".", end="")
-            time.sleep(0.5)
-
+        while True:
             if model.get_status() not in ("generating", "training"):
-                print("\nFinished training sentiment_classifier model")
+                print("\nFinished adding repository to knowledge base")
                 break
 
         if model.get_status() == "error":
-            print("Something went wrong while training:")
-            print(model.data["error"])
+            return f"[bold][red]{model.data['error']}"
+
+        return f"[bold][green]Model created successfully"
 
     def predict(self, df, owner, repo):
         project = self._get_project()
-        model = project.get_model(f"{owner}_{repo}")
+        model = project.get_model(f"{owner}_{repo}".lower())
         return model.predict(df)
 
     def _get_keys(self):
