@@ -1,40 +1,57 @@
+from octo import Octo
 import argparse
-from constants.info import DESCRIPTION, VERSION, ASCII_ART
-from getpass import getpass
-import keyring
+import pandas as pd
 
 
-def save_password(email, password):
-    # Set the password in the keyring
-    keyring.set_password(service_name="Octo", username=email, password=password)
+def main():
+    git = Octo()
+    git._load_state()
+    git.connect_local()
+
+    parser = argparse.ArgumentParser(description="Simple Git-like CLI tool")
+    subparsers = parser.add_subparsers(dest="command", help="Subcommands")
+
+    # Command: init
+    parser_init = subparsers.add_parser("init", help="Initialize a new repository")
+    parser_init.add_argument("repo", help="Repository name")
+    parser_init.add_argument("branch", help="Repository owner")
+    parser_init.add_argument("--all", help="Repository branch", action="store_true")
+
+    # Command: checkout
+    parser_checkout = subparsers.add_parser(
+        "checkout", help="Switch to a different branch"
+    )
+    parser_checkout.add_argument("repo", help="Branch to checkout")
+
+    # Command: tell
+    parser_tell = subparsers.add_parser("tell", help="Tell Octo to do something")
+    parser_tell.add_argument("action", help="Action to perform")
+
+    # Command: status
+    parser_status = subparsers.add_parser(
+        "status", help="Show the status of the repository"
+    )
+
+    args = parser.parse_args()
+
+    if args.command == "init":
+        owner = args.repo.split("/")[0]
+        repo = args.repo.split("/")[1]
+        git.init(repo, owner, args.branch, all_files=args.all)
+
+    elif args.command == "checkout":
+        owner = args.repo.split("/")[0]
+        repo = args.repo.split("/")[1]
+        git.checkout(owner, repo)
+
+    elif args.command == "status":
+        git.status()
+
+    elif args.command == "tell":
+        df = pd.DataFrame({"questions": [args.action]})
+        pred_df = git.tell(df)
+        print(pred_df["answer"])
 
 
-parser = argparse.ArgumentParser(
-    description=DESCRIPTION,
-    formatter_class=argparse.RawDescriptionHelpFormatter,
-    prog="octo",
-)
-
-parser.add_argument(
-    "-v", "--version", action="version", version=ASCII_ART.format(VERSION)
-)
-parser.add_argument(
-    "auth", help="Authenticate the user with Mindsdb", action="store_true"
-)
-
-parser.add_argument("init", help="Initialize the project")
-
-args = parser.parse_args()
-
-if args.auth:
-    email = input("Enter your email: ")
-    password = getpass(f"Enter password for {email}: ")
-
-    # Save the password using keyring
-    save_password(email, password)
-    print(f"Password successfully set for {email}")
-    # You can add additional authentication logic here if needed
-
-elif args.init:
-    # Add logic for project initialization here
-    print("Initializing the project")
+if __name__ == "__main__":
+    main()
