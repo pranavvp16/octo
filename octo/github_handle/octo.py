@@ -1,9 +1,9 @@
 import os
 import json
-from octo.github_handle.mindsdb_octo import MindsdbOcto
+from octo.github_handle.mindsdb_octo import Mindsdb_Github
 
 
-class Octo(MindsdbOcto):
+class Octo(Mindsdb_Github):
     def __init__(self):
         super().__init__()
         self.repo_initialized = False
@@ -16,8 +16,7 @@ class Octo(MindsdbOcto):
             os.makedirs(".octo")
             self.repo = repo
             self.owner = owner
-            if branch:
-                self.branch = branch
+            self.branch = branch
             self.repo_initialized = True
             message = self.create_model(
                 self.owner, self.repo, self.branch, all_files=all_files
@@ -63,6 +62,15 @@ class Octo(MindsdbOcto):
         pred = self.predict(df, self.owner, self.repo)
         return pred
 
+    def drop(self, owner, repo):
+        project = self._get_project()
+        model_names = [i.name for i in project.list_models()]
+        if f"{owner}_{repo}" not in model_names:
+            return f"[bold][red]Error: Model {owner}/{repo} does not exist"
+        else:
+            project.drop_model(f"{owner}_{repo}")
+            return f"[bold][green]Deleted model {owner}/{repo}"
+
     def _save_state(self):
         state = {
             "repo": self.repo,
@@ -79,3 +87,4 @@ class Octo(MindsdbOcto):
             self.repo = state["repo"]
             self.owner = state["owner"]
             self.branch = state["branch"]
+

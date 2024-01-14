@@ -6,7 +6,7 @@ import time
 from octo.templates.query_dicts import using_dict, using_dict_all
 
 
-class MindsdbOcto:
+class Mindsdb_Github:
     """Mindsdb class to interact with Mindsdb SDK"""
 
     def __init__(self):
@@ -15,16 +15,21 @@ class MindsdbOcto:
         """
         self.connection_string = "http://127.0.0.1:47334"
 
-    def connect_local(self):
+    def start_local(self):
         """
         Connect to local installation of mindsdb
         """
         # Run shell command to start the local mindsdb server
-        subprocess.Popen(
-            ["python", "-m", "mindsdb"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+        command = "nohup python -m mindsdb > mindsdb.log 2>&1 &"
+        subprocess.run(command, shell=True, check=True)
+
+    def stop_local(self):
+        """
+        Stop local installation of mindsdb
+        """
+        # Run shell command to stop the local mindsdb server
+        command = 'pkill -f "python"'
+        subprocess.run(command, shell=True, check=True)
 
     def create_model(self, owner, repo, branch, all_files=False):
         project = self._get_project()
@@ -84,6 +89,13 @@ class MindsdbOcto:
         return openai_api_key, github_token
 
     def _get_project(self):
-        server = mindsdb_sdk.connect(self.connection_string)
-        project = server.get_project()
+        try:
+            server = mindsdb_sdk.connect(self.connection_string)
+            project = server.get_project()
+        except:
+            time.sleep(10)
+            server = mindsdb_sdk.connect(self.connection_string)
+            project = server.get_project()
         return project
+
+

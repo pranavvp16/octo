@@ -1,0 +1,7 @@
+rich
+git+https://github.com/pranavvp16/mindsdb.git@llama_index
+mindsdb_sql==0.7.4
+mindsdb_sdk
+openai==1.6.1
+llama_index==0.9.27
+llama_hub==0.0.67
