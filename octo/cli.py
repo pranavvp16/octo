@@ -1,5 +1,5 @@
 from octo import Octo
-from octo import DESCRIPTION, VERSION, ASCII_ART
+from octo import ASCII_ART
 from octo import __version__
 
 from rich.console import Console
@@ -59,55 +59,49 @@ def main():
     except:
         if args.command == "start":
             with console.status("[bold green]Starting Mindsdb...", spinner="dots2"):
-                try:
                     octo.start_local()
-                except:
-                    rprint(
-                        "[bold][red]Error: Mindsdb is not installed. Use 'pip install mindsdb' to install."
-                    )
-                    return
-                rprint(f"[bold][green]Started Mindsdb local server")
+                    console.print(f"[bold][green]Started Mindsdb local server")
         else:
-            rprint(
+            console.print(
                 "[bold][red]Error: Mindsdb server is not running. Use 'octo start' to start the server."
             )
             return
 
     if args.command == "stop":
         octo.stop_local()
-        rprint(f"[bold][green]Stopped Mindsdb local server")
+        console.print(f"[bold][green]Stopped Mindsdb local server")
 
     if args.command == "init":
         try:
             owner = args.repo.split("/")[0]
             repo = args.repo.split("/")[1]
         except:
-            rprint(
+            console.print(
                 "[bold][red]Error: Invalid repository name, format should be 'owner/repo'"
             )
             return
         with console.status("[bold green]Initializing repository...", spinner="dots2"):
-            rprint(f"[bold][green] Creating model {owner}/{repo}")
+            console.print(f"[bold][green] Creating model {owner}/{repo}")
             message = octo.init(repo, owner, args.branch, all_files=args.all)
-            rprint(message)
+            console.print(message)
 
     if args.command == "drop":
         try:
             owner = args.repo.split("/")[0]
             repo = args.repo.split("/")[1]
         except:
-            rprint(
+            console.print(
                 "[bold][red]Error: Invalid repository name, format should be 'owner/repo'"
             )
             return
         project = octo._get_project()
         model_names = [i.name for i in project.list_models()]
         if f"{owner}_{repo}" not in model_names:
-            rprint(f"[bold][red]Error: Model {owner}/{repo} does not exist")
+            console.print(f"[bold][red]Error: Model {owner}/{repo} does not exist")
             return
         else:
             project.drop_model(f"{owner}_{repo}")
-            rprint(f"[bold][green]Deleted model {owner}/{repo}")
+            console.print(f"[bold][green]Deleted model {owner}/{repo}")
 
     if args.version:
         text = ASCII_ART.format(__version__)
@@ -123,11 +117,11 @@ def main():
             )
             return
         message = octo.checkout(owner, repo)
-        console.log(message)
+        console.print(message)
 
     if args.command == "status":
         message = octo.status()
-        console.log(message)
+        console.print(message)
 
     if args.command == "tell":
         df = pd.DataFrame({"questions": [args.action]})
@@ -136,7 +130,8 @@ def main():
             answer = pred_df["answer"].iloc[0]
             # Filter string
             answer = answer.replace("\n", "")
-            rprint(answer)
+            console.print(f"\n{answer}")
+            return
 
     if args.command == "drop":
         try:
@@ -148,7 +143,7 @@ def main():
             )
             return
         message = octo.drop(owner, repo)
-        rprint(message)
+        console.print(message)
 
     if args.command == "list":
         model_names = octo.list_models()
@@ -156,7 +151,7 @@ def main():
         model_names = [i.replace("_", "/") for i in model_names]
         with console.status("[bold green]Fetching models...", spinner="dots2"):
             for i in model_names:
-                rprint(i)
+                console.print(i)
 
 
 

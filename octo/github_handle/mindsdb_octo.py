@@ -29,7 +29,7 @@ class Mindsdb_Github:
         """
         # Run shell command to stop the local mindsdb server
         command = 'pkill -f "python"'
-        subprocess.run(command, shell=True, check=True)
+        subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL)
 
     def create_model(self, owner, repo, branch, all_files=False):
         project = self._get_project()
@@ -61,13 +61,12 @@ class Mindsdb_Github:
             )
         while True:
             if model.get_status() not in ("generating", "training"):
-                print("\nFinished adding repository to knowledge base")
                 break
 
         if model.get_status() == "error":
-            return f"[bold][red]{model.data['error']}"
+            return f"[bold][red]{model.data['error']}", True
 
-        return f"[bold][green]Model created successfully"
+        return f"[bold][green]Model created successfully", False
 
     def predict(self, df, owner, repo):
         project = self._get_project()

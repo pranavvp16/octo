@@ -18,10 +18,11 @@ class Octo(Mindsdb_Github):
             self.owner = owner
             self.branch = branch
             self.repo_initialized = True
-            message = self.create_model(
+            message, error = self.create_model(
                 self.owner, self.repo, self.branch, all_files=all_files
             )
-            self._save_state()
+            if not error:
+                self._save_state()
         elif (
             self.repo.lower() == repo
             and self.owner.lower() == owner
@@ -34,10 +35,11 @@ class Octo(Mindsdb_Github):
             self.owner = owner
             self.branch = branch
             self.repo_initialized = True
-            message = self.create_model(
+            message, error = self.create_model(
                 self.owner, self.repo, self.branch, all_files=all_files
             )
-            self._save_state()
+            if not error:
+                self._save_state()
         return message
 
     def checkout(self, owner, repo):
@@ -64,12 +66,11 @@ class Octo(Mindsdb_Github):
 
     def drop(self, owner, repo):
         project = self._get_project()
-        model_names = [i.name for i in project.list_models()]
-        if f"{owner}_{repo}" not in model_names:
-            return f"[bold][red]Error: Model {owner}/{repo} does not exist"
-        else:
+        try:
             project.drop_model(f"{owner}_{repo}")
             return f"[bold][green]Deleted model {owner}/{repo}"
+        except:
+            return f"[bold][red]Error: Model {owner}/{repo} does not exist"
 
     def _save_state(self):
         state = {
