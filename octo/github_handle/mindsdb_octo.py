@@ -20,7 +20,7 @@ class Mindsdb_Github:
         Connect to local installation of mindsdb
         """
         # Run shell command to start the local mindsdb server
-        if debug:
+        if not debug:
             command = "nohup python -m mindsdb > /dev/null 2>&1 &"
         else:
             command = "nohup python -m mindsdb > mindsdb.log 2>&1 &"
