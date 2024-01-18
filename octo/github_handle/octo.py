@@ -23,11 +23,7 @@ class Octo(Mindsdb_Github):
             )
             if not error:
                 self._save_state()
-        elif (
-            self.repo.lower() == repo
-            and self.owner.lower() == owner
-            and self.branch.lower() == branch
-        ):
+        elif self.repo == repo and self.owner == owner and self.branch == branch:
             message = f"[bold][blue]Repository already initialized."
             self.repo_initialized = True
         else:
@@ -88,4 +84,3 @@ class Octo(Mindsdb_Github):
             self.repo = state["repo"]
             self.owner = state["owner"]
             self.branch = state["branch"]
-

@@ -17,6 +17,8 @@ parser.add_argument("--version", action="store_true", help="Show version number"
 
 # Command: Start Mindsdb server
 parser_start = subparsers.add_parser("start", help="Start the Mindsdb server")
+parser_start.add_argument("--debug", action="store_true", help="Debug mode")
+
 parser_stop = subparsers.add_parser("stop", help="Stop the Mindsdb server")
 
 # Command: init
@@ -59,8 +61,8 @@ def main():
     except:
         if args.command == "start":
             with console.status("[bold green]Starting Mindsdb...", spinner="dots2"):
-                    octo.start_local()
-                    console.print(f"[bold][green]Started Mindsdb local server")
+                octo.start_local(debug=args.debug)
+                console.print(f"[bold][green]Started Mindsdb local server")
         else:
             console.print(
                 "[bold][red]Error: Mindsdb server is not running. Use 'octo start' to start the server."
@@ -73,8 +75,8 @@ def main():
 
     if args.command == "init":
         try:
-            owner = args.repo.split("/")[0]
-            repo = args.repo.split("/")[1]
+            owner = args.repo.split("/")[0].lower()
+            repo = args.repo.split("/")[1].lower()
         except:
             console.print(
                 "[bold][red]Error: Invalid repository name, format should be 'owner/repo'"
@@ -152,7 +154,6 @@ def main():
         with console.status("[bold green]Fetching models...", spinner="dots2"):
             for i in model_names:
                 console.print(i)
-
 
 
 if __name__ == "__main__":

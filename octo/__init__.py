@@ -5,4 +5,3 @@ from .constants.info import DESCRIPTION, VERSION, ASCII_ART
 __author__ = "Pranav Prajapati"
 __email__ = "pranavprajapti586@gmail.com"
 __version__ = "0.1.0"
-

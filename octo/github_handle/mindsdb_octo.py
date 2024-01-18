@@ -15,12 +15,15 @@ class Mindsdb_Github:
         """
         self.connection_string = "http://127.0.0.1:47334"
 
-    def start_local(self):
+    def start_local(self, debug=False):
         """
         Connect to local installation of mindsdb
         """
         # Run shell command to start the local mindsdb server
-        command = "nohup python -m mindsdb > mindsdb.log 2>&1 &"
+        if debug:
+            command = "nohup python -m mindsdb > /dev/null 2>&1 &"
+        else:
+            command = "nohup python -m mindsdb > mindsdb.log 2>&1 &"
         subprocess.run(command, shell=True, check=True)
 
     def stop_local(self):
@@ -96,5 +99,3 @@ class Mindsdb_Github:
             server = mindsdb_sdk.connect(self.connection_string)
             project = server.get_project()
         return project
-
-
